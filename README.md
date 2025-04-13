@@ -4,6 +4,8 @@ This is the skeleton code for Algorithms and Analysis COSC2123/3119 - *Dynamic P
 locations are known) and partially observable ones (where treasure locations aren’t unknown),
 which requires strategic exploration and value estimation when solving the maze.
 
+[Additional information, as well as the specification, can be found here.]([www.google.com](https://rmit.instructure.com/courses/141229/assignments/1076865))
+
 ## Technical Specification
 
 The main script is *mazeRunner.py*. It is in the same folder as this README, and is run with the command:
