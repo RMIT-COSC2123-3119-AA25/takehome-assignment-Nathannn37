@@ -49,6 +49,8 @@ After implementation, the optimal items will be highlighted in green, saved in t
 
 ![Alt text](testing/example_viz/example_viz.png)
 
+In order to create your own visualisations, you will need to install matplotlib.
+
 ## Testing
 
 For your convenience, we have included a very basic test file. It can be run by entering the testing folder and running:
