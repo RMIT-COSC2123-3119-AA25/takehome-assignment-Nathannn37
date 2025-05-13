@@ -34,7 +34,7 @@ class Knapsack:
         """
         Calls the method to calculate the optimal knapsack solution
         @param maze: The maze we are considering
-        """
+        """  
         map = []
         # Sort by row (i) first, then column (j)
         sorted_items = sorted(maze.m_items.items(), key=lambda item: (item[0][0], item[0][1]))
@@ -71,10 +71,10 @@ class Knapsack:
         # Increment call count on every call - feed back into the function on each call for testing
         stats['count'] += 1
 
-        # delete the below 3 lines if function implemented
-        with open(filename + '.txt', "w") as f:
-            f.write(str(stats['count']))
-        stats['logged'] = True
+        # # delete the below 3 lines if function implemented
+        # with open(filename + '.txt', "w") as f:
+        #     f.write(str(stats['count']))
+        # stats['logged'] = True
 
         # Base case
         if capacity == 0 or num_items == 0:
@@ -87,8 +87,43 @@ class Knapsack:
         """
         IMPLEMENT ME FOR TASK A
         """
+        T = items
+        c = capacity
+        k = num_items
 
-        return [], 0, 0
+        self.optimalCells = []
+        self.optimalValue = 0
+        self.optimalWeight = 0
+        if c == 0 or k == 0:
+            return self.optimalCells, self.optimalWeight, self.optimalValue
+        
+        t = T[k-1]
+        location, weight, value = t
+
+        if weight > c: 
+            return self.recursiveKnapsack(T, c, k-1, filename, stats)
+    
+        locationInc = []
+        weightInc = 0
+        valueInc = 0
+
+        locationExc = []
+        weightExc = 0
+        valueExc = 0
+
+        (locationInc, weightInc, valueInc) = self.recursiveKnapsack(T, c - weight, k-1, filename, stats)
+        (locationExc, weightExc, valueExc) = self.recursiveKnapsack(T, c, k-1, filename, stats)
+
+        if valueInc + value > valueExc:
+            self.optimalCells = locationInc + [location]
+            self.optimalWeight = weightInc + weight
+            self.optimalValue = valueInc + value
+        else:
+            self.optimalCells = locationExc
+            self.optimalWeight = weightExc
+            self.optimalValue = valueExc
+
+        return self.optimalCells, self.optimalWeight, self.optimalValue
 
     def dynamicKnapsack(self, items: list, capacity: int, num_items: int, filename: str):
         """
