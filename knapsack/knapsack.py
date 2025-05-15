@@ -87,6 +87,7 @@ class Knapsack:
         """
         IMPLEMENT ME FOR TASK A
         """
+        # Assigning the variables according to skeleton code
         T = items
         c = capacity
         k = num_items
@@ -94,6 +95,7 @@ class Knapsack:
         self.optimalCells = []
         self.optimalValue = 0
         self.optimalWeight = 0
+        # If knapsack capacity is zero or the postive integer k is zero return the initalized variables 
         if c == 0 or k == 0:
             return self.optimalCells, self.optimalWeight, self.optimalValue
         
