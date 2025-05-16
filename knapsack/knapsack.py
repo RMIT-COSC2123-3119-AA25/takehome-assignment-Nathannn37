@@ -150,28 +150,17 @@ class Knapsack:
         """
         IMPLEMENT ME FOR TASK B
         """
-        # t = items[num_items-1]
-        # location, weight, value = t
-
         w = []
         v = []
-
-        # for n in range(num_items):
-        #     w.append(weight)
-        #     v.append(value)
 
         def MFKnapsack(num_items, capacity): 
 
             if (num_items == 0 or capacity == 0):
-                return 0
+                dp[num_items][capacity]
             
-            # w = items[num_items-1][1]
-            # v = items[num_items-1][2]
-            # w = [item[1] for item in items]  list of weights
             for i in range(num_items):
                 w.append(items[i][1])
 
-            # v = [item[2] for item in items] list of values
             for i in range(num_items):
                 v.append(items[i][2])
 
@@ -183,8 +172,18 @@ class Knapsack:
                     x = max( MFKnapsack(num_items-1, capacity), v[num_items-1] + MFKnapsack(num_items - 1, capacity - w[num_items-1]))
                 dp[num_items][capacity] = x
             return dp[num_items][capacity]
+        max_value = MFKnapsack(num_items, capacity)
 
-        MFKnapsack(num_items, capacity)
+        selected_items = []
+        selected_weight = 0
+        c = capacity
+
+        for i in range(num_items, 0, -1):
+            if dp[i][c] != dp[i - 1][c]:
+                loc, wt, val = items[i - 1]
+                selected_items.append(loc)
+                selected_weight += wt
+                c -= wt
         # === Save DP Table to CSV ===
         self.saveCSV(dp, items, capacity, filename)
 
