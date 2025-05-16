@@ -150,28 +150,34 @@ class Knapsack:
         """
         IMPLEMENT ME FOR TASK B
         """
+        # list to store the weights of the items
         w = []
+        # list to store the values of the items
         v = []
 
         def MFKnapsack(num_items, capacity): 
-
+            # Base case
             if (num_items == 0 or capacity == 0):
                 dp[num_items][capacity]
-            
+            # Storing the weights into the weight list
             for i in range(num_items):
                 w.append(items[i][1])
-
+            # Storing the values into the value list
             for i in range(num_items):
                 v.append(items[i][2])
 
-            
+            # If this position in the dp table is none then
             if dp[num_items][capacity] is None:
+                # Checks if the capacity is less than the weight at num_items-1
                 if capacity < w[num_items-1]:
+                    # Moves up in the table (Doesn't take that item)
                     x = MFKnapsack(num_items-1, capacity)
                 else:
+                    # (Takes the item)
                     x = max( MFKnapsack(num_items-1, capacity), v[num_items-1] + MFKnapsack(num_items - 1, capacity - w[num_items-1]))
                 dp[num_items][capacity] = x
             return dp[num_items][capacity]
+        
         max_value = MFKnapsack(num_items, capacity)
 
         selected_items = []
@@ -179,6 +185,8 @@ class Knapsack:
         c = capacity
 
         for i in range(num_items, 0, -1):
+            # Checks if the current postion in the dp table is the same value as the value one above it
+            # if its not the same than it picked up the item
             if dp[i][c] != dp[i - 1][c]:
                 loc, wt, val = items[i - 1]
                 selected_items.append(loc)
