@@ -102,13 +102,16 @@ class Knapsack:
         t = T[k-1]
         location, weight, value = t
 
+        # If the weight of the item is larger than the capacity return the recurisiveKnapsack function
         if weight > c: 
             return self.recursiveKnapsack(T, c, k-1, filename, stats)
     
+        # Include
         locationInc = []
         weightInc = 0
         valueInc = 0
 
+        # Exclude
         locationExc = []
         weightExc = 0
         valueExc = 0
@@ -116,6 +119,7 @@ class Knapsack:
         (locationInc, weightInc, valueInc) = self.recursiveKnapsack(T, c - weight, k-1, filename, stats)
         (locationExc, weightExc, valueExc) = self.recursiveKnapsack(T, c, k-1, filename, stats)
 
+        # Including the viable items with their location, weight and value
         if valueInc + value > valueExc:
             self.optimalCells = locationInc + [location]
             self.optimalWeight = weightInc + weight
@@ -146,6 +150,25 @@ class Knapsack:
         """
         IMPLEMENT ME FOR TASK B
         """
+        t = items[num_items-1]
+        location, weight, value = t
+
+        w = []
+        v = []
+
+        for i in range(num_items):
+            w.append(weight)
+            v.append(value)
+
+
+        def MFKnapsack(i,j): 
+            if dp[i,j] < 0:
+                if j < w[i]:
+                    x = MFKnapsack(i-1, j)
+                else:
+                    x = max( MFKnapsack(i-1, j), v[i] + MFKnapsack(i - 1, j - w[i]))
+                dp[i,j] = x
+            return dp[i,j]
 
         # === Save DP Table to CSV ===
         self.saveCSV(dp, items, capacity, filename)
