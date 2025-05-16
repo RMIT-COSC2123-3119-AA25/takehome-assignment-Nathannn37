@@ -150,27 +150,39 @@ class Knapsack:
         """
         IMPLEMENT ME FOR TASK B
         """
-        t = items[num_items-1]
-        location, weight, value = t
+        # t = items[num_items-1]
+        # location, weight, value = t
 
         w = []
         v = []
 
-        for n in range(num_items):
-            w.append(weight)
-            v.append(value)
+        # for n in range(num_items):
+        #     w.append(weight)
+        #     v.append(value)
 
         def MFKnapsack(num_items, capacity): 
+
             if (num_items == 0 or capacity == 0):
                 return 0
             
-            if dp[num_items, capacity] < 0:
-                if capacity < w[num_items]:
+            # w = items[num_items-1][1]
+            # v = items[num_items-1][2]
+            # w = [item[1] for item in items]  list of weights
+            for i in range(num_items):
+                w.append(items[i][1])
+
+            # v = [item[2] for item in items] list of values
+            for i in range(num_items):
+                v.append(items[i][2])
+
+            
+            if dp[num_items][capacity] is None:
+                if capacity < w[num_items-1]:
                     x = MFKnapsack(num_items-1, capacity)
                 else:
-                    x = max( MFKnapsack(num_items-1, capacity), v[num_items] + MFKnapsack(num_items - 1, capacity - w[num_items]))
-                dp[num_items, capacity] = x
-            return dp[num_items, capacity]
+                    x = max( MFKnapsack(num_items-1, capacity), v[num_items-1] + MFKnapsack(num_items - 1, capacity - w[num_items-1]))
+                dp[num_items][capacity] = x
+            return dp[num_items][capacity]
 
         MFKnapsack(num_items, capacity)
         # === Save DP Table to CSV ===
