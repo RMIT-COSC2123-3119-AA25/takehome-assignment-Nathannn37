@@ -180,8 +180,6 @@ class Knapsack:
         
         max_value = MFKnapsack(num_items, capacity)
 
-        selected_items = []
-        selected_weight = 0
         c = capacity
 
         for i in range(num_items, 0, -1):
@@ -194,7 +192,7 @@ class Knapsack:
                 c -= wt
         # === Save DP Table to CSV ===
         self.saveCSV(dp, items, capacity, filename)
-
+ 
         return selected_items, selected_weight, max_value
 
     def saveCSV(self, dp: list, items: list, capacity: int, filename: str):
