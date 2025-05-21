@@ -31,6 +31,46 @@ class TaskDSolver:
 
     def reward(self):
         return self.m_knapsack.optimalValue - self.m_cellsExplored
+    
+    def bfs(self, maze: Maze, start: Coordinates, goal: Coordinates) -> List[Coordinates]:
+        """
+        Finds the shortest path between start and goal coordinate using breadth first search
+
+        @param maze: the maze we are working on.
+        @param start: the starting coordinate.
+        @param goal: the goal coordinate.
+
+        @return A list containing coordinates to go from the start to the goal.
+        """
+
+        if start == goal:
+            return [start]
+
+        visited = set()
+        queue = [start]
+        predecessors: Dict[Coordinates, Optional[Coordinates]] = {start: None}
+
+        while queue:
+            curr = queue.pop(0)
+
+            if curr == goal:
+                # Reconstruct path from goal to start
+                path = []
+                while curr is not None:
+                    path.append(curr)
+                    curr = predecessors[curr]
+                return list(reversed(path))
+
+            visited.add(curr)
+
+            for neighbor in maze.neighbours(curr):
+                if neighbor not in visited and neighbor not in predecessors:
+                    if not maze.hasWall(curr, neighbor):
+                        queue.append(neighbor)
+                        predecessors[neighbor] = curr
+
+        # If goal is unreachable (shouldn’t happen in a fully connected maze)
+        return []
 
     def solveMaze(self, maze: Maze, entrance: Coordinates, exit: Coordinates):
         """
@@ -51,6 +91,10 @@ class TaskDSolver:
 
         Returns: Nothing, but updates variables
         """
+        # set up initial condition for knapsack
+        self.m_knapsack.optimalCells = []
+        self.m_knapsack.optimalValue = 0
+        self.m_knapsack.optimalWeight = 0
 
         self.m_solverPath = []
         self.m_entranceUsed = entrance
