@@ -95,17 +95,33 @@ class TaskDSolver:
         self.m_knapsack.optimalCells = []
         self.m_knapsack.optimalValue = 0
         self.m_knapsack.optimalWeight = 0
+
+        # get the number of items in the maze from the paramaters
+        items_in_maze = maze.m_itemParams[0]
+        # calculate total weight in maze form item list
+        maze_item_weight = sum(weight_value[0] for weight_value in maze.m_items.values())
+        # calculate total value in maze from item list
+        maze_item_value = sum(weight_value[1] for weight_value in maze.m_items.values())
         
+        midmaze = [maze.colNum // 2][maze.rowNum // 2]
         # Find the path from entrance to exit
         path = self.bfs(maze, entrance, exit)
 
+        points = [entrance] + midmaze + [exit]
+
+        for i in range(len(points)):
+            for j in range(len(points)):
+                if j != i:
+                    path = self.bfs(maze, points[i], points[j])
+
         for cell in path:
-            # Check if the cell has an item
-            if cell in maze.m_items:
-                weight, value = maze.m_items[cell]
+            # Convert `cell` to a tuple to match the format in `maze.m_items`
+            cell_tuple = (cell.getRow(), cell.getCol())
+            if cell_tuple in maze.m_items:
+                weight, value = maze.m_items[cell_tuple]
                 # Check if adding the item exceeds the knapsack capacity
                 if self.m_knapsack.optimalWeight + weight <= self.m_knapsack.capacity:
-                    self.m_knapsack.optimalCells.append(cell)
+                    self.m_knapsack.optimalCells.append(cell_tuple)
                     self.m_knapsack.optimalWeight += weight
                     self.m_knapsack.optimalValue += value
 
