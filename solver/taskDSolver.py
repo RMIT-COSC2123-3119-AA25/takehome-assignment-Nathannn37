@@ -91,14 +91,23 @@ class TaskDSolver:
 
         Returns: Nothing, but updates variables
         """
-        
-
-        path = self.bfs(maze, entrance, exit)
-
-        # set up initial condition for knapsack
+         # set up initial condition for knapsack
         self.m_knapsack.optimalCells = []
         self.m_knapsack.optimalValue = 0
         self.m_knapsack.optimalWeight = 0
+        
+        # Find the path from entrance to exit
+        path = self.bfs(maze, entrance, exit)
+
+        for cell in path:
+            # Check if the cell has an item
+            if cell in maze.m_items:
+                weight, value = maze.m_items[cell]
+                # Check if adding the item exceeds the knapsack capacity
+                if self.m_knapsack.optimalWeight + weight <= self.m_knapsack.capacity:
+                    self.m_knapsack.optimalCells.append(cell)
+                    self.m_knapsack.optimalWeight += weight
+                    self.m_knapsack.optimalValue += value
 
         self.m_solverPath = path
         self.m_entranceUsed = entrance
