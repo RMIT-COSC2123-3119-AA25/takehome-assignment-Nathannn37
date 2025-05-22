@@ -91,12 +91,16 @@ class TaskDSolver:
 
         Returns: Nothing, but updates variables
         """
+        
+
+        path = self.bfs(maze, entrance, exit)
+
         # set up initial condition for knapsack
         self.m_knapsack.optimalCells = []
         self.m_knapsack.optimalValue = 0
         self.m_knapsack.optimalWeight = 0
 
-        self.m_solverPath = []
+        self.m_solverPath = path
         self.m_entranceUsed = entrance
         self.m_exitUsed = exit
         self.m_cellsExplored = len(set(self.m_solverPath))
