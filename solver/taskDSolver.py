@@ -14,6 +14,7 @@ from knapsack.knapsack import Knapsack
 from itertools import permutations
 
 from typing import List, Dict, Optional
+import random
 
 
 class TaskDSolver:
@@ -72,130 +73,68 @@ class TaskDSolver:
         # If goal is unreachable (shouldn’t happen in a fully connected maze)
         return []
 
-    # def solveMaze(self, maze: Maze, entrance: Coordinates, exit: Coordinates):
-    #     """
-    #     Moves through the maze cell by cell using neighbours and bfs.
-    #     Tracks every cell entered, including backtracking steps.
-    #     """
-    #     # Initialize knapsack and solver state
-    #     self.m_knapsack.optimalCells = []
-    #     self.m_knapsack.optimalValue = 0
-    #     self.m_knapsack.optimalWeight = 0
+    def dynamicKnapsack(self, items: list, capacity: int, num_items: int, filename: str):
+        """
+        Dynamic 0/1 Knapsack that saves the dynamic programming table as a csv.
 
-    #     # get the number of items in the maze from the paramaters
-    #     items_in_maze = maze.m_itemParams[0]
-    #     # calculate total weight in maze form item list
-    #     maze_item_weight = sum(weight_value[0] for weight_value in maze.m_items.values())
-    #     # calculate total value in maze from item list
-    #     maze_item_value = sum(weight_value[1] for weight_value in maze.m_items.values())
+        @param items: list of (name, weight, value)
+        @param capacity: current remaining knapsack capacity
+        @param num_items: number of items still being considered
+        @param filename: save name for csv of table (used for testing)
+        """
+        # Initialize DP table with None
+        dp = [[None] * (capacity + 1) for _ in range(num_items + 1)]
+        # first row is all 0s
+        dp[0] = [0] * (capacity + 1)
+
+        selected_items, selected_weight, max_value = [], 0, 0
+
+        """
+        IMPLEMENT ME FOR TASK B
+        """
+        # list to store the weights of the items
+        w = []
+        # list to store the values of the items
+        v = []
+
+        def MFKnapsack(num_items, capacity): 
+            # Base case
+            if (num_items == 0 or capacity == 0):
+                dp[num_items][capacity]
+            # Storing the weights into the weight list
+            for i in range(num_items):
+                w.append(items[i][1])
+            # Storing the values into the value list
+            for i in range(num_items):
+                v.append(items[i][2])
+
+            # If this position in the dp table is none then
+            if dp[num_items][capacity] is None:
+                # Checks if the capacity is less than the weight at num_items-1
+                if capacity < w[num_items-1]:
+                    # Moves up in the table (Doesn't take that item)
+                    x = MFKnapsack(num_items-1, capacity)
+                else:
+                    # (Takes the item)
+                    x = max( MFKnapsack(num_items-1, capacity), v[num_items-1] + MFKnapsack(num_items - 1, capacity - w[num_items-1]))
+                dp[num_items][capacity] = x
+            return dp[num_items][capacity]
         
-    #     mazesize = maze.rowNum() * maze.colNum()
-    #     currItems = items_in_maze
-    #     treasureprob = (currItems*maze_item_value)/mazesize
-    #     currValue = maze_item_value
+        max_value = MFKnapsack(num_items, capacity)
 
-    #     # Start at the entrance
-    #     current_cell = entrance
-    #     self.m_solverPath = [current_cell]  # Track the full path
-    #     visited = set()  # Track visited cells
-    #     visited.add(current_cell)
-    #     mazesize -= 1 # Decrement for the entrance cell
-    #     self.m_cellsExplored += 1
+        c = capacity
 
-    #     while current_cell != exit:
-    #         # Check if the current cell contains an item
-    #         cell_tuple = (current_cell.getRow(), current_cell.getCol())
-    #         print("MazeSize: ",  mazesize, " Items: ", currItems)
-    #         if cell_tuple in maze.m_items:
-    #             weight, value = maze.m_items[cell_tuple]
-    #             density = (currItems*currValue)/mazesize
-    #             print(density)
-    #             if density >= treasureprob:
-    #                 # if self.m_knapsack.optimalWeight + weight <= self.m_knapsack.capacity:
-    #                 if cell_tuple not in self.m_knapsack.optimalCells:
-    #                     self.m_knapsack.optimalCells.append(cell_tuple)
-    #                     print("Adding item to knapsack: ", cell_tuple)
-    #                     currItems -= 1
-    #                     currValue -= value
-    #                     self.m_knapsack.optimalWeight += weight
-    #                     self.m_knapsack.optimalValue += value
-    #                 # else:
-    #                 #     print("Knapsack is full. Moving to exit.")
-    #                 #     path_to_exit = self.bfs(maze, current_cell, exit)
-    #                 #     self.m_solverPath.extend(path_to_exit[1:])
-    #                 #     break
-    #             else:
-    #                 if cell_tuple not in self.m_knapsack.optimalCells:
-    #                     self.m_knapsack.optimalCells.append(cell_tuple)
-    #                     print("Adding item to knapsack: ", cell_tuple)
-    #                     currItems -= 1
-    #                     self.m_knapsack.optimalWeight += weight
-    #                     self.m_knapsack.optimalValue += value
-    #                 print("Moving to exit treasureprobabilty.")
-    #                 path_to_exit = self.bfs(maze, current_cell, exit)
-    #                 self.m_solverPath.extend(path_to_exit[1:])
-    #                 break
+        for i in range(num_items, 0, -1):
+            # Checks if the current postion in the dp table is the same value as the value one above it
+            # if its not the same than it picked up the item
+            if dp[i][c] != dp[i - 1][c]:
+                loc, wt, val = items[i - 1]
+                selected_items.append(loc)
+                selected_weight += wt
+                c -= wt
 
-    #         # Find unvisited neighbors
-    #         neighbors = maze.neighbours(current_cell)
-    #         next_cell = None
-    #         for neighbor in neighbors:
-    #             if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
-    #                 next_cell = neighbor
-    #                 break
+        return selected_items, selected_weight, max_value
 
-    #         # If no unvisited neighbors are found, backtrack
-    #         if not next_cell:
-    #             found_new_path = False
-    #             path_len = len(self.m_solverPath)
-                
-    #             # Step-by-step backtracking
-    #             for backtrack_index in range(path_len - 2, -1, -1):  # Skip the current cell
-    #                 backtrack_cell = self.m_solverPath[backtrack_index]
-
-    #                 # Check that there’s no wall between current and backtrack_cell
-    #                 if not maze.hasWall(current_cell, backtrack_cell):
-    #                     # Move to that cell
-    #                     current_cell = backtrack_cell
-    #                     self.m_solverPath.append(current_cell)
-    #                     # self.m_cellsExplored += 1
-
-    #                     # Look for unvisited neighbor from here
-    #                     neighbors = maze.neighbours(current_cell)
-    #                     for neighbor in neighbors:
-    #                         if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
-    #                             # Move to the valid neighbor
-    #                             self.m_solverPath.append(neighbor)
-    #                             visited.add(neighbor)
-    #                             current_cell = neighbor
-    #                             # self.m_cellsExplored += 1
-    #                             found_new_path = True
-    #                             break
-
-    #                     if found_new_path:
-    #                         break
-
-    #             if not found_new_path:
-    #                 print("Dead end: no valid unvisited neighbor after backtracking.")
-    #                 break
-    #             continue
-    #         # Move to the next cell
-    #         print("Moving to next cell: ", next_cell)
-    #         current_cell = next_cell
-    #         self.m_solverPath.append(current_cell)
-    #         visited.add(current_cell)
-    #         mazesize -= 1
-    #         self.m_cellsExplored += 1
-
-    #     # Update solver state
-    #     self.m_entranceUsed = entrance
-    #     self.m_exitUsed = exit
-    #     self.m_reward = self.reward()
-
-    #     print("solver path: ", len(self.m_solverPath))
-    #     print("Visted cells: ", len(visited))
-    #     print("Optimal value: ", self.m_knapsack.optimalValue)
-    #     print("Total cells explored: ", self.m_cellsExplored)
     def solveMaze(self, maze: Maze, entrance: Coordinates, exit: Coordinates):
         """
         Moves through the maze cell by cell using neighbours and bfs.
@@ -206,13 +145,17 @@ class TaskDSolver:
         self.m_knapsack.optimalValue = 0
         self.m_knapsack.optimalWeight = 0
 
-        # Get maze item stats
+        # get the number of items in the maze from the paramaters
         items_in_maze = maze.m_itemParams[0]
-        maze_item_value = sum(v for _, v in maze.m_items.values())
-        currItems = items_in_maze
-        currValue = maze_item_value
+        # calculate total weight in maze form item list
+        maze_item_weight = sum(weight_value[0] for weight_value in maze.m_items.values())
+        # calculate total value in maze from item list
+        maze_item_value = sum(weight_value[1] for weight_value in maze.m_items.values())
+        
         mazesize = maze.rowNum() * maze.colNum()
-        treasureprob = (currItems * maze_item_value) / mazesize
+        currItems = items_in_maze
+        treasureprob = (currItems*maze_item_value)/mazesize
+        currValue = maze_item_value
 
         # Start
         current_cell = entrance
@@ -247,13 +190,16 @@ class TaskDSolver:
             # Explore neighbors
             neighbors = maze.neighbours(current_cell)
             next_cell = None
+            list_of_neighbors = []
             for neighbor in neighbors:
                 if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
-                    next_cell = neighbor
-                    break
-
+                    list_of_neighbors.append(neighbor)
+            # Randomly select an unvisited neighbor if there is a valid one
+            if list_of_neighbors:
+                next_cell = random.choice(list_of_neighbors)
+        
             if not next_cell:
-                # Backtrack
+                # Backtrack visted cells till an unvisited cell is found
                 found_new_path = False
                 for backtrack_index in range(len(self.m_solverPath) - 2, -1, -1):
                     backtrack_cell = self.m_solverPath[backtrack_index]
