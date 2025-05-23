@@ -73,7 +73,7 @@ class TaskDSolver:
         # If goal is unreachable (shouldn’t happen in a fully connected maze)
         return []
 
-    def dynamicKnapsack(self, items: list, capacity: int, num_items: int, filename: str):
+    def dynamicKnapsack(self, items: list, capacity: int, num_items: int):
         """
         Dynamic 0/1 Knapsack that saves the dynamic programming table as a csv.
 
@@ -156,6 +156,8 @@ class TaskDSolver:
         currItems = items_in_maze
         treasureprob = (currItems*maze_item_value)/mazesize
         currValue = maze_item_value
+        item_data = []
+        num_items = 0
 
         # Start
         current_cell = entrance
@@ -171,17 +173,23 @@ class TaskDSolver:
                 weight, value = maze.m_items[cell_tuple]
                 density = (currItems * currValue) / mazesize
                 if cell_tuple not in self.m_knapsack.optimalCells:
-                    self.m_knapsack.optimalCells.append(cell_tuple)
                     currItems -= 1
                     currValue -= value
-                    self.m_knapsack.optimalWeight += weight
-                    self.m_knapsack.optimalValue += value
+                    num_items += 1
+                    item_data.append((cell_tuple, weight, value))
 
                 if density < treasureprob:
                     print("Density below threshold. Moving to exit.")
                     path_to_exit = self.bfs(maze, current_cell, exit)
                     for step in path_to_exit[1:]:
                         self.m_solverPath.append(step)
+                        step_tuple = (step.getRow(), step.getCol())
+                        if step_tuple in maze.m_items and step_tuple not in self.m_knapsack.optimalCells:
+                            weight, value = maze.m_items[step_tuple]
+                            currItems -= 1
+                            currValue -= value
+                            num_items += 1
+                            item_data.append((step_tuple, weight, value))
                         if step not in visited:
                             visited.add(step)
                             self.m_cellsExplored += 1
@@ -234,6 +242,10 @@ class TaskDSolver:
                 self.m_cellsExplored += 1
             mazesize -= 1
 
+        self.m_knapsack.optimalCells, self.m_knapsack.optimalWeight, self.m_knapsack.optimalValue = self.dynamicKnapsack(item_data,
+                                                                                         self.m_knapsack.capacity,
+                                                                                         num_items
+                                                                                )
         # Final state update
         self.m_entranceUsed = entrance
         self.m_exitUsed = exit
