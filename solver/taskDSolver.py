@@ -72,61 +72,227 @@ class TaskDSolver:
         # If goal is unreachable (shouldn’t happen in a fully connected maze)
         return []
 
+    # def solveMaze(self, maze: Maze, entrance: Coordinates, exit: Coordinates):
+    #     """
+    #     Moves through the maze cell by cell using neighbours and bfs.
+    #     Tracks every cell entered, including backtracking steps.
+    #     """
+    #     # Initialize knapsack and solver state
+    #     self.m_knapsack.optimalCells = []
+    #     self.m_knapsack.optimalValue = 0
+    #     self.m_knapsack.optimalWeight = 0
+
+    #     # get the number of items in the maze from the paramaters
+    #     items_in_maze = maze.m_itemParams[0]
+    #     # calculate total weight in maze form item list
+    #     maze_item_weight = sum(weight_value[0] for weight_value in maze.m_items.values())
+    #     # calculate total value in maze from item list
+    #     maze_item_value = sum(weight_value[1] for weight_value in maze.m_items.values())
+        
+    #     mazesize = maze.rowNum() * maze.colNum()
+    #     currItems = items_in_maze
+    #     treasureprob = (currItems*maze_item_value)/mazesize
+    #     currValue = maze_item_value
+
+    #     # Start at the entrance
+    #     current_cell = entrance
+    #     self.m_solverPath = [current_cell]  # Track the full path
+    #     visited = set()  # Track visited cells
+    #     visited.add(current_cell)
+    #     mazesize -= 1 # Decrement for the entrance cell
+    #     self.m_cellsExplored += 1
+
+    #     while current_cell != exit:
+    #         # Check if the current cell contains an item
+    #         cell_tuple = (current_cell.getRow(), current_cell.getCol())
+    #         print("MazeSize: ",  mazesize, " Items: ", currItems)
+    #         if cell_tuple in maze.m_items:
+    #             weight, value = maze.m_items[cell_tuple]
+    #             density = (currItems*currValue)/mazesize
+    #             print(density)
+    #             if density >= treasureprob:
+    #                 # if self.m_knapsack.optimalWeight + weight <= self.m_knapsack.capacity:
+    #                 if cell_tuple not in self.m_knapsack.optimalCells:
+    #                     self.m_knapsack.optimalCells.append(cell_tuple)
+    #                     print("Adding item to knapsack: ", cell_tuple)
+    #                     currItems -= 1
+    #                     currValue -= value
+    #                     self.m_knapsack.optimalWeight += weight
+    #                     self.m_knapsack.optimalValue += value
+    #                 # else:
+    #                 #     print("Knapsack is full. Moving to exit.")
+    #                 #     path_to_exit = self.bfs(maze, current_cell, exit)
+    #                 #     self.m_solverPath.extend(path_to_exit[1:])
+    #                 #     break
+    #             else:
+    #                 if cell_tuple not in self.m_knapsack.optimalCells:
+    #                     self.m_knapsack.optimalCells.append(cell_tuple)
+    #                     print("Adding item to knapsack: ", cell_tuple)
+    #                     currItems -= 1
+    #                     self.m_knapsack.optimalWeight += weight
+    #                     self.m_knapsack.optimalValue += value
+    #                 print("Moving to exit treasureprobabilty.")
+    #                 path_to_exit = self.bfs(maze, current_cell, exit)
+    #                 self.m_solverPath.extend(path_to_exit[1:])
+    #                 break
+
+    #         # Find unvisited neighbors
+    #         neighbors = maze.neighbours(current_cell)
+    #         next_cell = None
+    #         for neighbor in neighbors:
+    #             if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
+    #                 next_cell = neighbor
+    #                 break
+
+    #         # If no unvisited neighbors are found, backtrack
+    #         if not next_cell:
+    #             found_new_path = False
+    #             path_len = len(self.m_solverPath)
+                
+    #             # Step-by-step backtracking
+    #             for backtrack_index in range(path_len - 2, -1, -1):  # Skip the current cell
+    #                 backtrack_cell = self.m_solverPath[backtrack_index]
+
+    #                 # Check that there’s no wall between current and backtrack_cell
+    #                 if not maze.hasWall(current_cell, backtrack_cell):
+    #                     # Move to that cell
+    #                     current_cell = backtrack_cell
+    #                     self.m_solverPath.append(current_cell)
+    #                     # self.m_cellsExplored += 1
+
+    #                     # Look for unvisited neighbor from here
+    #                     neighbors = maze.neighbours(current_cell)
+    #                     for neighbor in neighbors:
+    #                         if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
+    #                             # Move to the valid neighbor
+    #                             self.m_solverPath.append(neighbor)
+    #                             visited.add(neighbor)
+    #                             current_cell = neighbor
+    #                             # self.m_cellsExplored += 1
+    #                             found_new_path = True
+    #                             break
+
+    #                     if found_new_path:
+    #                         break
+
+    #             if not found_new_path:
+    #                 print("Dead end: no valid unvisited neighbor after backtracking.")
+    #                 break
+    #             continue
+    #         # Move to the next cell
+    #         print("Moving to next cell: ", next_cell)
+    #         current_cell = next_cell
+    #         self.m_solverPath.append(current_cell)
+    #         visited.add(current_cell)
+    #         mazesize -= 1
+    #         self.m_cellsExplored += 1
+
+    #     # Update solver state
+    #     self.m_entranceUsed = entrance
+    #     self.m_exitUsed = exit
+    #     self.m_reward = self.reward()
+
+    #     print("solver path: ", len(self.m_solverPath))
+    #     print("Visted cells: ", len(visited))
+    #     print("Optimal value: ", self.m_knapsack.optimalValue)
+    #     print("Total cells explored: ", self.m_cellsExplored)
     def solveMaze(self, maze: Maze, entrance: Coordinates, exit: Coordinates):
         """
-        Solution for Task D goes here.
-
-        Be sure to increase self.m_cellsExplored whenever you visit a NEW cell
-        Be sure to increase the knapsack_value whenever you find an item and put it in your knapsack.
-        You may use the maze object to check if a cell you visit has an item
-        maze.m_itemParams can be used to calculate things like predicted reward, etc. But you can only use
-        maze.m_items to check if your current cell contains an item (and if so, what is its weight and value)
-
-        Code in this function will be rigorously tested. An honest but bad solution will still gain quite a few marks.
-        A cheated solution will gain 0 marks for all of Task D.
-        Args:
-            maze: maze object
-            entrance: initial entrance coord
-            exit: exit coord
-
-        Returns: Nothing, but updates variables
+        Moves through the maze cell by cell using neighbours and bfs.
+        Tracks every cell entered, including backtracking steps.
         """
-         # set up initial condition for knapsack
+        # Initialize knapsack and solver state
         self.m_knapsack.optimalCells = []
         self.m_knapsack.optimalValue = 0
         self.m_knapsack.optimalWeight = 0
 
-        # get the number of items in the maze from the paramaters
+        # Get maze item stats
         items_in_maze = maze.m_itemParams[0]
-        # calculate total weight in maze form item list
-        maze_item_weight = sum(weight_value[0] for weight_value in maze.m_items.values())
-        # calculate total value in maze from item list
-        maze_item_value = sum(weight_value[1] for weight_value in maze.m_items.values())
-        
-        midmaze = [maze.colNum // 2][maze.rowNum // 2]
-        # Find the path from entrance to exit
-        path = self.bfs(maze, entrance, exit)
+        maze_item_value = sum(v for _, v in maze.m_items.values())
+        currItems = items_in_maze
+        currValue = maze_item_value
+        mazesize = maze.rowNum() * maze.colNum()
+        treasureprob = (currItems * maze_item_value) / mazesize
 
-        points = [entrance] + midmaze + [exit]
+        # Start
+        current_cell = entrance
+        self.m_solverPath = [current_cell]
+        visited = {current_cell}
+        self.m_cellsExplored = 1
+        mazesize -= 1
 
-        for i in range(len(points)):
-            for j in range(len(points)):
-                if j != i:
-                    path = self.bfs(maze, points[i], points[j])
-
-        for cell in path:
-            # Convert `cell` to a tuple to match the format in `maze.m_items`
-            cell_tuple = (cell.getRow(), cell.getCol())
+        while current_cell != exit:
+            # Check for treasure
+            cell_tuple = (current_cell.getRow(), current_cell.getCol())
             if cell_tuple in maze.m_items:
                 weight, value = maze.m_items[cell_tuple]
-                # Check if adding the item exceeds the knapsack capacity
-                if self.m_knapsack.optimalWeight + weight <= self.m_knapsack.capacity:
+                density = (currItems * currValue) / mazesize
+                if cell_tuple not in self.m_knapsack.optimalCells:
                     self.m_knapsack.optimalCells.append(cell_tuple)
+                    currItems -= 1
+                    currValue -= value
                     self.m_knapsack.optimalWeight += weight
                     self.m_knapsack.optimalValue += value
 
-        self.m_solverPath = path
+                if density < treasureprob:
+                    print("Density below threshold. Moving to exit.")
+                    path_to_exit = self.bfs(maze, current_cell, exit)
+                    for step in path_to_exit[1:]:
+                        self.m_solverPath.append(step)
+                        if step not in visited:
+                            visited.add(step)
+                            self.m_cellsExplored += 1
+                    break
+
+            # Explore neighbors
+            neighbors = maze.neighbours(current_cell)
+            next_cell = None
+            for neighbor in neighbors:
+                if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
+                    next_cell = neighbor
+                    break
+
+            if not next_cell:
+                # Backtrack
+                found_new_path = False
+                for backtrack_index in range(len(self.m_solverPath) - 2, -1, -1):
+                    backtrack_cell = self.m_solverPath[backtrack_index]
+                    if not maze.hasWall(current_cell, backtrack_cell):
+                        current_cell = backtrack_cell
+                        self.m_solverPath.append(current_cell)
+                        if current_cell not in visited:
+                            visited.add(current_cell)
+                            self.m_cellsExplored += 1
+
+                        # Look for new direction
+                        for neighbor in maze.neighbours(current_cell):
+                            if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
+                                current_cell = neighbor
+                                self.m_solverPath.append(current_cell)
+                                visited.add(current_cell)
+                                self.m_cellsExplored += 1
+                                found_new_path = True
+                                break
+                        if found_new_path:
+                            break
+                if not found_new_path:
+                    print("Dead end during backtracking.")
+                    break
+                continue
+
+            # Move forward
+            current_cell = next_cell
+            self.m_solverPath.append(current_cell)
+            if current_cell not in visited:
+                visited.add(current_cell)
+                self.m_cellsExplored += 1
+            mazesize -= 1
+
+        # Final state update
         self.m_entranceUsed = entrance
         self.m_exitUsed = exit
-        self.m_cellsExplored = len(set(self.m_solverPath))
         self.m_reward = self.reward()
+
+        print("Solver path length:", len(self.m_solverPath))
+        print("Unique cells visited:", self.m_cellsExplored)
+        print("Optimal value:", self.m_knapsack.optimalValue)
