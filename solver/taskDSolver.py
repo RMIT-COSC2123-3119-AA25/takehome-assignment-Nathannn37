@@ -137,8 +137,22 @@ class TaskDSolver:
 
     def solveMaze(self, maze: Maze, entrance: Coordinates, exit: Coordinates):
         """
-        Moves through the maze cell by cell using neighbours and bfs.
-        Tracks every cell entered, including backtracking steps.
+        Solution for Task D goes here.
+
+        Be sure to increase self.m_cellsExplored whenever you visit a NEW cell
+        Be sure to increase the knapsack_value whenever you find an item and put it in your knapsack.
+        You may use the maze object to check if a cell you visit has an item
+        maze.m_itemParams can be used to calculate things like predicted reward, etc. But you can only use
+        maze.m_items to check if your current cell contains an item (and if so, what is its weight and value)
+
+        Code in this function will be rigorously tested. An honest but bad solution will still gain quite a few marks.
+        A cheated solution will gain 0 marks for all of Task D.
+        Args:
+            maze: maze object
+            entrance: initial entrance coord
+            exit: exit coord
+
+        Returns: Nothing, but updates variables
         """
         # Initialize knapsack and solver state
         self.m_knapsack.optimalCells = []
@@ -152,14 +166,15 @@ class TaskDSolver:
         # calculate total value in maze from item list
         maze_item_value = sum(weight_value[1] for weight_value in maze.m_items.values())
         
+        # Initialize variables
         mazesize = maze.rowNum() * maze.colNum()
         currItems = items_in_maze
-        treasureprob = (currItems*maze_item_value)/mazesize
+        initialThreshold = (currItems*maze_item_value)/mazesize
         currValue = maze_item_value
         item_data = []
         num_items = 0
 
-        # Start
+        # Start at the entrance
         current_cell = entrance
         self.m_solverPath = [current_cell]
         visited = {current_cell}
@@ -167,20 +182,23 @@ class TaskDSolver:
         mazesize -= 1
 
         while current_cell != exit:
-            # Check for treasure
+            # Checks for treasure in the current cell
             cell_tuple = (current_cell.getRow(), current_cell.getCol())
             if cell_tuple in maze.m_items:
                 weight, value = maze.m_items[cell_tuple]
                 density = (currItems * currValue) / mazesize
+                # Checks if the item is not already in the knapsack
+                # Increases known items and adds the item to item data
                 if cell_tuple not in self.m_knapsack.optimalCells:
                     currItems -= 1
                     currValue -= value
                     num_items += 1
                     item_data.append((cell_tuple, weight, value))
 
-                if density < treasureprob:
+                if density < initialThreshold:
                     print("Density below threshold. Moving to exit.")
                     path_to_exit = self.bfs(maze, current_cell, exit)
+                    # Checks for items in path to exit
                     for step in path_to_exit[1:]:
                         self.m_solverPath.append(step)
                         step_tuple = (step.getRow(), step.getCol())
@@ -207,8 +225,9 @@ class TaskDSolver:
                 next_cell = random.choice(list_of_neighbors)
         
             if not next_cell:
-                # Backtrack visted cells till an unvisited cell is found
+                # Backtrack visited cells till an unvisited cell is found
                 found_new_path = False
+                # Backtracks to previous cell in the path and continues backtracking till an unvisited cell is found
                 for backtrack_index in range(len(self.m_solverPath) - 2, -1, -1):
                     backtrack_cell = self.m_solverPath[backtrack_index]
                     if not maze.hasWall(current_cell, backtrack_cell):
@@ -220,6 +239,7 @@ class TaskDSolver:
 
                         # Look for new direction
                         for neighbor in maze.neighbours(current_cell):
+                            # If the neighbor is a new cell and not a wall break
                             if neighbor not in visited and not maze.hasWall(current_cell, neighbor):
                                 current_cell = neighbor
                                 self.m_solverPath.append(current_cell)
@@ -230,7 +250,6 @@ class TaskDSolver:
                         if found_new_path:
                             break
                 if not found_new_path:
-                    print("Dead end during backtracking.")
                     break
                 continue
 
