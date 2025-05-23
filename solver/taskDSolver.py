@@ -161,8 +161,6 @@ class TaskDSolver:
 
         # get the number of items in the maze from the paramaters
         items_in_maze = maze.m_itemParams[0]
-        # calculate total weight in maze form item list
-        maze_item_weight = sum(weight_value[0] for weight_value in maze.m_items.values())
         # calculate total value in maze from item list
         maze_item_value = sum(weight_value[1] for weight_value in maze.m_items.values())
         
@@ -180,6 +178,7 @@ class TaskDSolver:
         visited = {current_cell}
         self.m_cellsExplored = 1
         mazesize -= 1
+
 
         while current_cell != exit:
             # Checks for treasure in the current cell
@@ -260,7 +259,8 @@ class TaskDSolver:
                 visited.add(current_cell)
                 self.m_cellsExplored += 1
             mazesize -= 1
-
+            
+        # Use dynamic knapsack to find the optimal items
         self.m_knapsack.optimalCells, self.m_knapsack.optimalWeight, self.m_knapsack.optimalValue = self.dynamicKnapsack(item_data,
                                                                                          self.m_knapsack.capacity,
                                                                                          num_items
@@ -269,7 +269,3 @@ class TaskDSolver:
         self.m_entranceUsed = entrance
         self.m_exitUsed = exit
         self.m_reward = self.reward()
-
-        print("Solver path length:", len(self.m_solverPath))
-        print("Unique cells visited:", self.m_cellsExplored)
-        print("Optimal value:", self.m_knapsack.optimalValue)
